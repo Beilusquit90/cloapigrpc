@@ -1,4 +1,5 @@
 # cloackApi
 1. grpc файлики для клоапи
 # gen proto
-protoc --go_out=. --go_opt=paths=source_relative     --go-grpc_out=. --go-grpc_opt=paths=source_relative     clo_api.proto# cloapigrpc
+protoc --go_out=. --go_opt=paths=source_relative     --go-grpc_out=. --go-grpc_opt=paths=source_relative     clo_api.proto
+# cloapigrpc
