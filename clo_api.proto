@@ -28,6 +28,8 @@ service CloapiRPC {
   rpc DeleteWhitePage(FtpPage)returns(GRPCResponce){} // Должно удалять вайтпейджи со всех клоак для определенного пользователя.
   rpc DeleteAllWhitePages(FtpPage)returns(GRPCResponce){} // Должно удалять все вайтпейджи одного пользователя со всех клоак
   rpc GetWhitePage(FtpPage)returns(FtpPage){}
+  rpc GetWhitesByUser(FtpPage)returns(FtpPage){}
+  rpc GetAllWhitepagesByUser(TgUser) returns (stream FtpPage) {}
 }
 
 
@@ -41,6 +43,10 @@ message FtpPage{
 message GRPCResponce{
     bool success = 1;
     string responce = 3;
+}
+
+message TgUser{
+    int64 userID = 1;
 }
 
 

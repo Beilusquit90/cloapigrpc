@@ -27,6 +27,8 @@ type CloapiRPCClient interface {
 	DeleteWhitePage(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*GRPCResponce, error)
 	DeleteAllWhitePages(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*GRPCResponce, error)
 	GetWhitePage(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*FtpPage, error)
+	GetWhitesByUser(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*FtpPage, error)
+	GetAllWhitepagesByUser(ctx context.Context, in *TgUser, opts ...grpc.CallOption) (CloapiRPC_GetAllWhitepagesByUserClient, error)
 }
 
 type cloapiRPCClient struct {
@@ -73,6 +75,47 @@ func (c *cloapiRPCClient) GetWhitePage(ctx context.Context, in *FtpPage, opts ..
 	return out, nil
 }
 
+func (c *cloapiRPCClient) GetWhitesByUser(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*FtpPage, error) {
+	out := new(FtpPage)
+	err := c.cc.Invoke(ctx, "/cloapi_grpc.CloapiRPC/GetWhitesByUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cloapiRPCClient) GetAllWhitepagesByUser(ctx context.Context, in *TgUser, opts ...grpc.CallOption) (CloapiRPC_GetAllWhitepagesByUserClient, error) {
+	stream, err := c.cc.NewStream(ctx, &CloapiRPC_ServiceDesc.Streams[0], "/cloapi_grpc.CloapiRPC/GetAllWhitepagesByUser", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &cloapiRPCGetAllWhitepagesByUserClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type CloapiRPC_GetAllWhitepagesByUserClient interface {
+	Recv() (*FtpPage, error)
+	grpc.ClientStream
+}
+
+type cloapiRPCGetAllWhitepagesByUserClient struct {
+	grpc.ClientStream
+}
+
+func (x *cloapiRPCGetAllWhitepagesByUserClient) Recv() (*FtpPage, error) {
+	m := new(FtpPage)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // CloapiRPCServer is the server API for CloapiRPC service.
 // All implementations must embed UnimplementedCloapiRPCServer
 // for forward compatibility
@@ -82,6 +125,8 @@ type CloapiRPCServer interface {
 	DeleteWhitePage(context.Context, *FtpPage) (*GRPCResponce, error)
 	DeleteAllWhitePages(context.Context, *FtpPage) (*GRPCResponce, error)
 	GetWhitePage(context.Context, *FtpPage) (*FtpPage, error)
+	GetWhitesByUser(context.Context, *FtpPage) (*FtpPage, error)
+	GetAllWhitepagesByUser(*TgUser, CloapiRPC_GetAllWhitepagesByUserServer) error
 	mustEmbedUnimplementedCloapiRPCServer()
 }
 
@@ -100,6 +145,12 @@ func (UnimplementedCloapiRPCServer) DeleteAllWhitePages(context.Context, *FtpPag
 }
 func (UnimplementedCloapiRPCServer) GetWhitePage(context.Context, *FtpPage) (*FtpPage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWhitePage not implemented")
+}
+func (UnimplementedCloapiRPCServer) GetWhitesByUser(context.Context, *FtpPage) (*FtpPage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWhitesByUser not implemented")
+}
+func (UnimplementedCloapiRPCServer) GetAllWhitepagesByUser(*TgUser, CloapiRPC_GetAllWhitepagesByUserServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllWhitepagesByUser not implemented")
 }
 func (UnimplementedCloapiRPCServer) mustEmbedUnimplementedCloapiRPCServer() {}
 
@@ -186,6 +237,45 @@ func _CloapiRPC_GetWhitePage_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CloapiRPC_GetWhitesByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FtpPage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CloapiRPCServer).GetWhitesByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloapi_grpc.CloapiRPC/GetWhitesByUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CloapiRPCServer).GetWhitesByUser(ctx, req.(*FtpPage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CloapiRPC_GetAllWhitepagesByUser_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TgUser)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CloapiRPCServer).GetAllWhitepagesByUser(m, &cloapiRPCGetAllWhitepagesByUserServer{stream})
+}
+
+type CloapiRPC_GetAllWhitepagesByUserServer interface {
+	Send(*FtpPage) error
+	grpc.ServerStream
+}
+
+type cloapiRPCGetAllWhitepagesByUserServer struct {
+	grpc.ServerStream
+}
+
+func (x *cloapiRPCGetAllWhitepagesByUserServer) Send(m *FtpPage) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // CloapiRPC_ServiceDesc is the grpc.ServiceDesc for CloapiRPC service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -209,7 +299,17 @@ var CloapiRPC_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetWhitePage",
 			Handler:    _CloapiRPC_GetWhitePage_Handler,
 		},
+		{
+			MethodName: "GetWhitesByUser",
+			Handler:    _CloapiRPC_GetWhitesByUser_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllWhitepagesByUser",
+			Handler:       _CloapiRPC_GetAllWhitepagesByUser_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "clo_api.proto",
 }
