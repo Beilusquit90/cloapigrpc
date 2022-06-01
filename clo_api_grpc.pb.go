@@ -29,6 +29,7 @@ type CloapiRPCClient interface {
 	GetWhitePage(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*FtpPage, error)
 	GetWhitesByUser(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*FtpPage, error)
 	GetAllWhitepagesByUser(ctx context.Context, in *TgUser, opts ...grpc.CallOption) (CloapiRPC_GetAllWhitepagesByUserClient, error)
+	CreateRec1809(ctx context.Context, in *Rec1809, opts ...grpc.CallOption) (*GRPCResponce, error)
 }
 
 type cloapiRPCClient struct {
@@ -116,6 +117,15 @@ func (x *cloapiRPCGetAllWhitepagesByUserClient) Recv() (*FtpPage, error) {
 	return m, nil
 }
 
+func (c *cloapiRPCClient) CreateRec1809(ctx context.Context, in *Rec1809, opts ...grpc.CallOption) (*GRPCResponce, error) {
+	out := new(GRPCResponce)
+	err := c.cc.Invoke(ctx, "/cloapi_grpc.CloapiRPC/CreateRec1809", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CloapiRPCServer is the server API for CloapiRPC service.
 // All implementations must embed UnimplementedCloapiRPCServer
 // for forward compatibility
@@ -127,6 +137,7 @@ type CloapiRPCServer interface {
 	GetWhitePage(context.Context, *FtpPage) (*FtpPage, error)
 	GetWhitesByUser(context.Context, *FtpPage) (*FtpPage, error)
 	GetAllWhitepagesByUser(*TgUser, CloapiRPC_GetAllWhitepagesByUserServer) error
+	CreateRec1809(context.Context, *Rec1809) (*GRPCResponce, error)
 	mustEmbedUnimplementedCloapiRPCServer()
 }
 
@@ -151,6 +162,9 @@ func (UnimplementedCloapiRPCServer) GetWhitesByUser(context.Context, *FtpPage) (
 }
 func (UnimplementedCloapiRPCServer) GetAllWhitepagesByUser(*TgUser, CloapiRPC_GetAllWhitepagesByUserServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAllWhitepagesByUser not implemented")
+}
+func (UnimplementedCloapiRPCServer) CreateRec1809(context.Context, *Rec1809) (*GRPCResponce, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRec1809 not implemented")
 }
 func (UnimplementedCloapiRPCServer) mustEmbedUnimplementedCloapiRPCServer() {}
 
@@ -276,6 +290,24 @@ func (x *cloapiRPCGetAllWhitepagesByUserServer) Send(m *FtpPage) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _CloapiRPC_CreateRec1809_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Rec1809)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CloapiRPCServer).CreateRec1809(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloapi_grpc.CloapiRPC/CreateRec1809",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CloapiRPCServer).CreateRec1809(ctx, req.(*Rec1809))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CloapiRPC_ServiceDesc is the grpc.ServiceDesc for CloapiRPC service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -302,6 +334,10 @@ var CloapiRPC_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWhitesByUser",
 			Handler:    _CloapiRPC_GetWhitesByUser_Handler,
+		},
+		{
+			MethodName: "CreateRec1809",
+			Handler:    _CloapiRPC_CreateRec1809_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
