@@ -30,6 +30,8 @@ service CloapiRPC {
   rpc GetWhitePage(FtpPage)returns(FtpPage){}
   rpc GetWhitesByUser(FtpPage)returns(FtpPage){}
   rpc GetAllWhitepagesByUser(TgUser) returns (stream FtpPage) {}
+
+  rpc CreateRec1809(Rec1809)returns(GRPCResponce){} // Должно создать вайтпейдж на всех доступных инстансах
 }
 
 
@@ -38,6 +40,11 @@ message FtpPage{
     string whitename = 2;
     bytes file = 3;
     string pseudonym = 4;
+}
+message Rec1809{
+    int64 mfid = 1;
+    int64 start = 2;
+    int64 end = 3;
 }
 
 message GRPCResponce{
