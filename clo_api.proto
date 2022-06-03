@@ -31,7 +31,9 @@ service CloapiRPC {
   rpc GetWhitesByUser(FtpPage)returns(FtpPage){}
   rpc GetAllWhitepagesByUser(TgUser) returns (stream FtpPage) {}
 
-  rpc CreateRec1809(Rec1809)returns(GRPCResponce){} // Должно создать вайтпейдж на всех доступных инстансах
+  rpc CreateRec1809(Rec1809)returns(GRPCResponce){}
+  rpc CreateRecDimon(RecDimon)returns(GRPCResponce){} 
+  rpc CreateRecDimonDomains(RecDimonDomains)returns(GRPCResponce){}
 }
 
 
@@ -41,10 +43,29 @@ message FtpPage{
     bytes file = 3;
     string pseudonym = 4;
 }
+
 message Rec1809{
     int64 mfid = 1;
     int64 start = 2;
     int64 end = 3;
+}
+
+
+message RecDimon{
+    int64 mfid = 1;
+    int64 start = 2;
+    int64 end = 3;
+    bool subflag = 4;
+    bool sub4flag = 5;
+}
+
+
+// func GetInfoForDimonDomains(MFID int64, domains []string, subflag bool, sub4flag bool) error {
+message RecDimonDomains{
+    int64 mfid = 1;
+    string domains = 2;
+    bool subflag = 3;
+    bool sub4flag = 4;
 }
 
 message GRPCResponce{

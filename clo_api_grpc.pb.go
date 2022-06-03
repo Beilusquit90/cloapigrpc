@@ -30,6 +30,8 @@ type CloapiRPCClient interface {
 	GetWhitesByUser(ctx context.Context, in *FtpPage, opts ...grpc.CallOption) (*FtpPage, error)
 	GetAllWhitepagesByUser(ctx context.Context, in *TgUser, opts ...grpc.CallOption) (CloapiRPC_GetAllWhitepagesByUserClient, error)
 	CreateRec1809(ctx context.Context, in *Rec1809, opts ...grpc.CallOption) (*GRPCResponce, error)
+	CreateRecDimon(ctx context.Context, in *RecDimon, opts ...grpc.CallOption) (*GRPCResponce, error)
+	CreateRecDimonDomains(ctx context.Context, in *RecDimonDomains, opts ...grpc.CallOption) (*GRPCResponce, error)
 }
 
 type cloapiRPCClient struct {
@@ -126,6 +128,24 @@ func (c *cloapiRPCClient) CreateRec1809(ctx context.Context, in *Rec1809, opts .
 	return out, nil
 }
 
+func (c *cloapiRPCClient) CreateRecDimon(ctx context.Context, in *RecDimon, opts ...grpc.CallOption) (*GRPCResponce, error) {
+	out := new(GRPCResponce)
+	err := c.cc.Invoke(ctx, "/cloapi_grpc.CloapiRPC/CreateRecDimon", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cloapiRPCClient) CreateRecDimonDomains(ctx context.Context, in *RecDimonDomains, opts ...grpc.CallOption) (*GRPCResponce, error) {
+	out := new(GRPCResponce)
+	err := c.cc.Invoke(ctx, "/cloapi_grpc.CloapiRPC/CreateRecDimonDomains", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CloapiRPCServer is the server API for CloapiRPC service.
 // All implementations must embed UnimplementedCloapiRPCServer
 // for forward compatibility
@@ -138,6 +158,8 @@ type CloapiRPCServer interface {
 	GetWhitesByUser(context.Context, *FtpPage) (*FtpPage, error)
 	GetAllWhitepagesByUser(*TgUser, CloapiRPC_GetAllWhitepagesByUserServer) error
 	CreateRec1809(context.Context, *Rec1809) (*GRPCResponce, error)
+	CreateRecDimon(context.Context, *RecDimon) (*GRPCResponce, error)
+	CreateRecDimonDomains(context.Context, *RecDimonDomains) (*GRPCResponce, error)
 	mustEmbedUnimplementedCloapiRPCServer()
 }
 
@@ -165,6 +187,12 @@ func (UnimplementedCloapiRPCServer) GetAllWhitepagesByUser(*TgUser, CloapiRPC_Ge
 }
 func (UnimplementedCloapiRPCServer) CreateRec1809(context.Context, *Rec1809) (*GRPCResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRec1809 not implemented")
+}
+func (UnimplementedCloapiRPCServer) CreateRecDimon(context.Context, *RecDimon) (*GRPCResponce, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRecDimon not implemented")
+}
+func (UnimplementedCloapiRPCServer) CreateRecDimonDomains(context.Context, *RecDimonDomains) (*GRPCResponce, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRecDimonDomains not implemented")
 }
 func (UnimplementedCloapiRPCServer) mustEmbedUnimplementedCloapiRPCServer() {}
 
@@ -308,6 +336,42 @@ func _CloapiRPC_CreateRec1809_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CloapiRPC_CreateRecDimon_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecDimon)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CloapiRPCServer).CreateRecDimon(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloapi_grpc.CloapiRPC/CreateRecDimon",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CloapiRPCServer).CreateRecDimon(ctx, req.(*RecDimon))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CloapiRPC_CreateRecDimonDomains_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecDimonDomains)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CloapiRPCServer).CreateRecDimonDomains(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloapi_grpc.CloapiRPC/CreateRecDimonDomains",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CloapiRPCServer).CreateRecDimonDomains(ctx, req.(*RecDimonDomains))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CloapiRPC_ServiceDesc is the grpc.ServiceDesc for CloapiRPC service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -338,6 +402,14 @@ var CloapiRPC_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateRec1809",
 			Handler:    _CloapiRPC_CreateRec1809_Handler,
+		},
+		{
+			MethodName: "CreateRecDimon",
+			Handler:    _CloapiRPC_CreateRecDimon_Handler,
+		},
+		{
+			MethodName: "CreateRecDimonDomains",
+			Handler:    _CloapiRPC_CreateRecDimonDomains_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
